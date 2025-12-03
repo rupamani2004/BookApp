@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Notes - Save & Load</title>
+
+  <!-- Internal CSS as required -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      padding: 30px;
+    }
+
+    .container {
+      width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    button {
+      padding: 10px 16px;
+      margin-top: 12px;
+      margin-right: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    #saveBtn { background: #4caf50; color: white; }
+    #loadBtn { background: #2196f3; color: white; }
+    #clearBtn { background: #f44336; color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Save & Load Notes</h2>
+
+    <!-- Text area where user enters notes -->
+    <textarea id="notesArea" placeholder="Type your notes here..."></textarea>
+
+    <br>
+
+    <!-- Buttons -->
+    <button id="saveBtn">Save Notes</button>
+    <button id="loadBtn">Load Notes</button>
+    <button id="clearBtn">Clear Notes</button>
+  </div>
+
+  <script>
+    const notesArea = document.getElementById("notesArea");
+
+    // -------------------------------
+    // On page load → load saved notes
+    // -------------------------------
+    window.onload = function () {
+      const savedNotes = localStorage.getItem("userNotes");
+
+      if (savedNotes) {
+        notesArea.value = savedNotes;
+      }
+    };
+
+    // -------------------------------
+    // Save Notes Button
+    // -------------------------------
+    document.getElementById("saveBtn").addEventListener("click", function () {
+
+      const text = notesArea.value.trim();
+
+      // validation - cannot save empty notes
+      if (text === "") {
+        alert("Please write something before saving.");
+        return;
+      }
+
+      localStorage.setItem("userNotes", text);
+      alert("Notes saved successfully!");
+    });
+
+    // -------------------------------
+    // Load Notes Button
+    // -------------------------------
+    document.getElementById("loadBtn").addEventListener("click", function () {
+      const savedNotes = localStorage.getItem("userNotes");
+
+      if (savedNotes) {
+        notesArea.value = savedNotes;
+        alert("Notes loaded!");
+      } else {
+        alert("No saved notes found.");
+      }
+    });
+
+    // -------------------------------
+    // Clear Notes Button
+    // -------------------------------
+    document.getElementById("clearBtn").addEventListener("click", function () {
+      localStorage.removeItem("userNotes");
+      notesArea.value = "";
+      alert("Notes cleared.");
+    });
+  </script>
+
+</body>
+</html>
