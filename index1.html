@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Add / Remove Paragraphs - DOM Practice</title>
+  <style>
+    /* Internal styling as required */
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f7f9fc;
+      color: #222;
+      margin: 32px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(20,20,40,0.06);
+      border-radius: 10px;
+      width: 760px;
+      padding: 24px;
+    }
+
+    h1 { margin: 0 0 16px 0; font-size: 24px; }
+    .controls { margin-bottom: 18px; display: flex; gap: 12px; }
+    button {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #d0d7df;
+      background: #eef6ff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:active { transform: translateY(1px); }
+    button#remove { background: #fff0f0; border-color: #f2c2c2; }
+
+    #message {
+      margin-top: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    #container {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px dashed #d9e2ef;
+      min-height: 80px;
+      background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+    }
+
+    /* paragraph style */
+    #container p {
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>DOM Exercise — Create / Remove Paragraphs</h1>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="add">Add Paragraph</button>
+      <button id="remove">Remove Last Paragraph</button>
+      <button id="clear">Clear All</button>
+    </div>
+
+    <div id="message">Click <strong>Add Paragraph</strong> to create a new paragraph inside the box below.</div>
+
+    <!-- This is the div where new paragraphs will be appended/removed -->
+    <div id="container" aria-live="polite"></div>
+  </div>
+
+  <script>
+    // Get references to DOM elements
+    const addBtn = document.getElementById('add');
+    const removeBtn = document.getElementById('remove');
+    const clearBtn = document.getElementById('clear');
+    const container = document.getElementById('container');
+    const message = document.getElementById('message');
+
+    // Counter to give each paragraph a unique number / text
+    let paragraphCount = 0;
+
+    // Add Paragraph: createElement + appendChild
+    addBtn.addEventListener('click', function () {
+      // create a new p element
+      const p = document.createElement('p');
+
+      // optional: give it an id or class (not required)
+      p.id = 'para-' + (paragraphCount + 1);
+
+      // add text to the paragraph
+      p.textContent = 'This is a new paragraph. Paragraph number: ' + (paragraphCount + 1) + '.';
+
+      // append the <p> to the container div
+      container.appendChild(p);
+
+      paragraphCount++;
+      updateMessage();
+    });
+
+    // Remove Last Paragraph: removeChild
+    removeBtn.addEventListener('click', function () {
+      // Check if container has any children
+      if (container.lastElementChild) {
+        // removeChild expects a node reference, so pass lastElementChild
+        container.removeChild(container.lastElementChild);
+        paragraphCount--;
+        updateMessage();
+      } else {
+        // No paragraphs to remove — show a friendly message
+        message.textContent = 'No paragraphs to remove. Click "Add Paragraph" first.';
+      }
+    });
+
+    // Clear all paragraphs (useful for testing)
+    clearBtn.addEventListener('click', function () {
+      // remove children until empty
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      paragraphCount = 0;
+      updateMessage();
+    });
+
+    // Keeps the user informed about how many paragraphs exist
+    function updateMessage() {
+      if (paragraphCount === 0) {
+        message.textContent = 'No paragraphs yet. Click "Add Paragraph" to create one.';
+      } else if (paragraphCount === 1) {
+        message.textContent = '1 paragraph inside the box.';
+      } else {
+        message.textContent = paragraphCount + ' paragraphs inside the box.';
+      }
+    }
+
+    // Initialize message
+    updateMessage();
+  </script>
+</body>
+</html>
