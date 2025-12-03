@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Todo List</title>
+
+  <!-- Internal CSS -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      padding: 30px;
+    }
+
+    .container {
+      width: 600px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    #taskInput {
+      width: 68%;
+    }
+
+    #addBtn {
+      background: #4caf50;
+      color: white;
+      margin-left: 10px;
+    }
+
+    #searchInput {
+      width: 97%;
+      margin-top: 15px;
+      background: #f9f9f9;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      background: #f6f6f6;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    .removeBtn {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Enhanced Todo List</h2>
+
+    <input type="text" id="taskInput" placeholder="Enter a task..." />
+    <button id="addBtn">Add</button>
+
+    <input type="text" id="searchInput" placeholder="Search tasks..." />
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const searchInput = document.getElementById("searchInput");
+    const taskList = document.getElementById("taskList");
+
+    // Load tasks from localStorage
+    let tasks = JSON.parse(localStorage.getItem("todoTasks")) || [];
+
+    // Display tasks
+    function renderTasks(filterText = "") {
+      taskList.innerHTML = "";
+
+      tasks
+        .filter(task => task.text.toLowerCase().includes(filterText.toLowerCase()))
+        .forEach(task => {
+          const li = document.createElement("li");
+
+          // Apply completed class if completed
+          if (task.completed) li.classList.add("completed");
+
+          li.innerHTML = `
+            <span>${task.text}</span>
+            <div>
+              <button class="removeBtn">Delete</button>
+            </div>
+          `;
+
+          // Toggle completion when clicking on text
+          li.querySelector("span").addEventListener("click", () => {
+            task.completed = !task.completed;
+            saveTasks();
+            renderTasks(searchInput.value);
+          });
+
+          // Delete task
+          li.querySelector(".removeBtn").addEventListener("click", () => {
+            tasks = tasks.filter(t => t.id !== task.id);
+            saveTasks();
+            renderTasks(searchInput.value);
+          });
+
+          taskList.appendChild(li);
+        });
+    }
+
+    // Save to localStorage
+    function saveTasks() {
+      localStorage.setItem("todoTasks", JSON.stringify(tasks));
+    }
+
+    // Add new task
+    document.getElementById("addBtn").addEventListener("click", () => {
+      const text = taskInput.value.trim();
+
+      if (text === "") {
+        alert("Please enter a task.");
+        return;
+      }
+
+      const newTask = {
+        id: Date.now(),      // unique ID
+        text: text,
+        completed: false
+      };
+
+      tasks.push(newTask);
+      saveTasks();
+      renderTasks(searchInput.value);
+
+      taskInput.value = "";
+    });
+
+    // Search tasks in real time
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value;
+      renderTasks(keyword);
+    });
+
+    // Initial render
+    renderTasks();
+  </script>
+
+</body>
+</html>
