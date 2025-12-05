@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo LocalStorage App</title>
+</head>
+<body>
+  <h1>Todos</h1>
+  <div id="todo-container"></div>
+
+  <script>
+    const API_URL = "https://jsonplaceholder.typicode.com/todos";
+    const LS_KEY = "masai_todos";
+
+    // ---- Fetch & store first 20 ----
+    async function fetchAndStoreTodos() {
+      const res = await fetch(API_URL);
+      const data = await res.json();                  // array of 200 todos
+      const first20 = data.slice(0, 20);              // keep only first 20
+      localStorage.setItem(LS_KEY, JSON.stringify(first20));
+    }
+
+    // ---- Read from localStorage ----
+    function getStoredTodos() {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    }
+
+    function saveTodos(todos) {
+      localStorage.setItem(LS_KEY, JSON.stringify(todos));
+    }
+
+    // ---- Render UI ----
+    function renderTodos() {
+      const todos = getStoredTodos();
+      const container = document.getElementById("todo-container");
+      container.innerHTML = "";                       // clear old UI
+
+      if (todos.length === 0) {
+        container.textContent = "No Todos Available";
+        return;
+      }
+
+      const ul = document.createElement("ul");
+
+      todos.forEach((todo, index) => {
+        const li = document.createElement("li");
+
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = todo.title + " ";
+
+        const statusSpan = document.createElement("span");
+        statusSpan.textContent = todo.completed ? "(Completed)" : "(Pending)";
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", function () {
+          deleteTodo(index);
+        });
+
+        li.appendChild(titleSpan);
+        li.appendChild(statusSpan);
+        li.appendChild(delBtn);
+        ul.appendChild(li);
+      });
+
+      container.appendChild(ul);
+    }
+
+    // ---- Delete logic ----
+    function deleteTodo(index) {
+      const todos = getStoredTodos();
+      todos.splice(index, 1);          // remove one item
+      saveTodos(todos);                // update localStorage
+      renderTodos();                   // re-render without refresh
+    }
+
+    // ---- Init ----
+    async function init() {
+      if (!localStorage.getItem(LS_KEY)) {
+        await fetchAndStoreTodos();    // first time: fetch & store
+      }
+      renderTodos();                   // always render from localStorage
+    }
+
+    init();
+  </script>
+</body>
+</html>
